@@ -6,6 +6,7 @@ export default class {
 		this.bot = bot;
 	}
 	async run(interaction: ICommandInteraction) {
+
 		if (!interaction.isCommand()) return;
 		let member = interaction.guild!.members.cache.get(interaction.user.id);
 		if (!member) member = await interaction.guild!.members.fetch(interaction.user.id);
@@ -13,15 +14,10 @@ export default class {
 		const command = this.bot.commands.get(interaction.commandName);
 		if (!command) return;
 
-		/* ---------------PERMISSIONS--------------- */
-		if (command.userPermissions.includes('MODERATOR')) {
-			const isMod = await this.bot.util.resolveModo(interaction.member)
-			if (!isMod) return interaction.replyErrorMessage(`You don't have permissions for use this command.`);
-		}
+
 		if (command.userPermissions.includes('BOT_ADMIN') && !this.bot.admins.includes(interaction.user.id)) {
 			return interaction.replyErrorMessage(`You don't have permissions for use this command.`);
 		}
-
 		if (command.userPermissions.length) {
 			for (const permission of command.userPermissions) {
 				if (!interaction.guild?.members.cache.get(interaction.user.id)!.permissions.has(permission))
@@ -51,17 +47,15 @@ export default class {
 			tStamps.set(interaction.user.id, timeNow);
 			setTimeout(() => tStamps.delete(interaction.user.id), cdAmount);
 		}
+
 		/* ---------------SUB-COMMAND--------------- */
-		if (interaction.options?.first()) {
-			interaction.options.each((o: any) => {
-				if (o.type === 'SUB_COMMAND') interaction.subcommand = o.name
-			})
-		}
-		if (!interaction.subcommand) interaction.subcommand = null;
+		interaction.subcommand = interaction.options.getSubcommand(false);
+
+		//interaction.subcommand = interaction.options
 		/* ---------------OPTIONS--------------- */
-		let args = null;
-		if (!interaction.subcommand) args = interaction.options;
-		else args = interaction.options.get(interaction.subcommand)?.options
+
+		let args: any = interaction.options;
+		// if (interaction.subcommand) args = interaction.options.get(interaction.subcommand)?.options;
 
 		/* ---------------COMMAND--------------- */
 		try {

@@ -19,7 +19,7 @@ class default_1 extends CommandClass_1.default {
         super(bot, {
             name: 'kick',
             aliases: [],
-            args: [
+            options: [
                 {
                     name: 'user',
                     description: 'User to be banned',
@@ -49,7 +49,7 @@ class default_1 extends CommandClass_1.default {
             const user = yield this.bot.util.resolveMember(interaction.guild, argUser);
             if (!user)
                 return interaction.replyErrorMessage(`User not found.`);
-            if (interactionMember.roles.highest.comparePositionTo(user.roles.highest) <= 0 && interaction.guild.ownerID !== interaction.user.id)
+            if (interactionMember.roles.highest.comparePositionTo(user.roles.highest) <= 0 && interaction.guild.ownerId !== interaction.user.id)
                 return interaction.replyErrorMessage(`You don't have the permission for this.`);
             const embed = new discord_js_1.MessageEmbed()
                 .setAuthor(`${user.user.username} (${user.id})`)
@@ -60,7 +60,7 @@ class default_1 extends CommandClass_1.default {
                 .setFooter(interaction.user.username, interaction.user.displayAvatarURL());
             if (user.kickable) {
                 try {
-                    yield user.send(embed);
+                    yield user.send({ embeds: [embed] });
                 }
                 finally {
                     user.kick(reason).then(() => {

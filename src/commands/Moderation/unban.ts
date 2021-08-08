@@ -7,7 +7,7 @@ export default class extends Command {
 		super(bot, {
 			name: 'unban',
 			aliases: [],
-			args: [
+			options: [
 				{
 					name: 'user',
 					description: 'User to change',

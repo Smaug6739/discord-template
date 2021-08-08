@@ -19,7 +19,7 @@ class default_1 extends CommandClass_1.default {
         super(bot, {
             name: 'warn',
             aliases: [],
-            args: [
+            options: [
                 {
                     name: 'user',
                     description: 'The user to warn',

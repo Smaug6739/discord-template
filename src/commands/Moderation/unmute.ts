@@ -8,7 +8,7 @@ export default class extends Command {
 		super(bot, {
 			name: 'unmute',
 			aliases: [],
-			args: [
+			options: [
 				{
 					name: 'user',
 					description: 'User for unmute',

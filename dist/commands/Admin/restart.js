@@ -18,7 +18,7 @@ class default_1 extends CommandClass_1.default {
         super(bot, {
             name: 'restart',
             aliases: [],
-            args: [],
+            options: [],
             description: 'Restart the bot.',
             category: 'Admin',
             cooldown: 5,

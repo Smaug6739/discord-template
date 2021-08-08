@@ -18,7 +18,7 @@ class default_1 extends CommandClass_1.default {
         super(bot, {
             name: 'unban',
             aliases: [],
-            args: [
+            options: [
                 {
                     name: 'user',
                     description: 'User to change',

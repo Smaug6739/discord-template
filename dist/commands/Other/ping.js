@@ -18,7 +18,7 @@ class default_1 extends CommandClass_1.default {
         super(bot, {
             name: 'ping',
             aliases: [],
-            args: [],
+            options: [],
             description: 'Get ping of the bot',
             category: 'Other',
             cooldown: 5,

@@ -1,6 +1,6 @@
 import Command from '../CommandClass';
 import type { ICommandInteraction, ICommandArgs } from '../../typescript/interfaces';
-import { Guild, MessageEmbed } from 'discord.js';
+import { MessageEmbed, TextChannel } from 'discord.js';
 import type { Role } from 'discord.js';
 import moment from 'moment';
 
@@ -10,7 +10,7 @@ export default class extends Command {
 		super(bot, {
 			name: 'infos',
 			aliases: [],
-			args: [],
+			options: [],
 			description: 'Get informations',
 			category: 'Other',
 			cooldown: 5,
@@ -20,7 +20,7 @@ export default class extends Command {
 				{
 					name: 'user',
 					description: 'Allows to have information about a user.',
-					args: [
+					options: [
 						{
 							name: 'user',
 							description: 'User to get infos',
@@ -32,17 +32,15 @@ export default class extends Command {
 				{
 					name: 'bot',
 					description: 'Allows to have information about bot.',
-					args: null,
 				},
 				{
 					name: 'server',
 					description: 'Allows to have information about server.',
-					args: null,
 				},
 				{
 					name: 'role',
 					description: 'Allows to have information about role.',
-					args: [
+					options: [
 						{
 							name: 'role',
 							description: 'Role to get infos',
@@ -54,7 +52,7 @@ export default class extends Command {
 				{
 					name: 'channel',
 					description: 'Allows to have information about channel.',
-					args: [
+					options: [
 						{
 							name: 'channel',
 							description: 'Channel to get infos',
@@ -72,27 +70,37 @@ export default class extends Command {
 				const argUser = args.get('user').value
 				const userInfo = await this.bot.util.resolveMember(interaction.guild!, argUser)
 				if (!userInfo) {
-					const u = await this.bot.util.resolveUser(argUser)
-					if (!u) return interaction.replyErrorMessage(`User not found`)
-					let BOTSTATUS;
-					if (u.bot) BOTSTATUS = 'yes'
-					else BOTSTATUS = 'no'
-					const embedUser = new MessageEmbed()
-						.setAuthor(`${u.username}#${u.discriminator}`, `${u.displayAvatarURL()}`)
-						.setColor(`${this.bot.colors.EMBEDCOLOR}`)
-						.setThumbnail(u.displayAvatarURL())
-						.addField(`\u200b`, `BOT : ${BOTSTATUS}`)
-						.setDescription('This user is no on the server.')
-						.setFooter(`User ID : ${u.id}`)
-					interaction.reply({ embeds: [embedUser] })
+					this.bot.client.users.fetch(args.get('user').value)
+						.then(u => {
+							let BOTSTATUS;
+							if (!u) return interaction.replyErrorMessage(`User not found.`)
+							if (u.bot) BOTSTATUS = 'yes'
+							else BOTSTATUS = 'no'
+							const embedUser = new MessageEmbed()
+								.setAuthor(`${u.username}#${u.discriminator}`, `${u.displayAvatarURL()}`)
+								.setColor(this.colors.embed)
+								.setThumbnail(u.displayAvatarURL())
+								.addField(`\u200b`, `BOT : ${BOTSTATUS}`)
+								.setDescription('This user is no on the server.')
+								.setFooter(`User ID : ${u.id}`)
+							return interaction.reply({ embeds: [embedUser] })
+						})
+						.catch(() => interaction.replyErrorMessage(`User not found.`))
 					break;
+
 				} else {
+					//if (use.user.presence.status === 'online') status = `${this.bot.emojis.ONLINE}Online`  ;
+					//if (use.user.presence.status === 'idle') status = `${this.bot.emojis.IDLE}Idle`;
+					//if (use.user.presence.status === 'dnd') status = `${this.bot.emojis.DND}Dnd`;
+					//if (use.user.presence.status === 'offline') status = `${this.bot.emojis.OFFLINE}Offline`;
+					//if (use.user.presence.clientStatus != null && use.user.presence.clientStatus.desktop === 'online') plateforme = '🖥️ Ordinateur'
+					//if (use.user.presence.clientStatus != null && use.user.presence.clientStatus.mobile === 'online') plateforme = '📱 Mobile'
 					let permissions_arr = userInfo.permissions.toArray().join(', ');
 					let permissions = permissions_arr.toString()
 					permissions = permissions.replace(/\_/g, ' ');
 					const embedMember = new MessageEmbed()
 					embedMember.setThumbnail(userInfo.user.displayAvatarURL())
-					embedMember.setColor(this.bot.colors.embed)
+					embedMember.setColor(this.colors.embed)
 					embedMember.setTitle(`${userInfo.user.username}`)
 					embedMember.addField('ID :', `${userInfo.user.id}`, true)
 					embedMember.addField('Tag :', `${userInfo.user.tag}`, true)
@@ -110,7 +118,7 @@ export default class extends Command {
 				const verssionBot = pck.version
 				const verssionDjs = pck.dependencies["discord.js"]
 				const embedBot = new MessageEmbed()
-					.setColor(this.bot.colors.embed)
+					.setColor(this.colors.embed)
 					.setAuthor(`${this.bot.client.user!.username} Info`, this.bot.client.user!.displayAvatarURL())
 					.setThumbnail(this.bot.client.user!.displayAvatarURL())
 					.addFields(
@@ -119,7 +127,7 @@ export default class extends Command {
 						{ name: 'Uptime', value: `${Math.floor(this.bot.client.uptime! / 1000 / 60).toString()} minutes`, inline: true },
 						{ name: 'Servers', value: `${this.bot.client.guilds.cache.size.toString()}`, inline: true },
 						{ name: 'Channels', value: `${this.bot.client.channels.cache.size.toString()}`, inline: true },
-						{ name: 'Users', value: `${this.bot.client.guilds.cache.map((g: Guild) => g.memberCount).reduce((a: number, b: number) => a + b)}`, inline: true },
+						{ name: 'Users', value: `${this.bot.client.guilds.cache.map(g => g.memberCount).reduce((a, b) => a + b)}`, inline: true },
 						{ name: 'Version', value: `${verssionBot}`, inline: true },
 						{ name: 'Library ', value: `discord.js (javascript)`, inline: true },
 						{ name: 'Library verssion', value: `${verssionDjs.replace('^', '')}`, inline: true },
@@ -132,7 +140,7 @@ export default class extends Command {
 				break;
 			case 'server':
 				const guild_name = interaction.guild!.name;
-				const owner = `<@${interaction.guild!.ownerID}>`;
+				const owner = `<@${interaction.guild!.ownerId}>`;
 				const boost = interaction.guild!.premiumSubscriptionCount;
 				let boostMsg = '';
 				if (!boost) boostMsg = "This server no have boost"
@@ -143,9 +151,9 @@ export default class extends Command {
 				// const idle = fetchedMembers.filter(member => member.presence.status === 'idle').size;
 				// const dnd = fetchedMembers.filter(member => member.presence.status === 'dnd').size;
 				// const off = fetchedMembers.filter(member => member.presence.status === 'offline').size;
-				const channel_t = interaction.guild!.channels.cache.filter(channel => channel.type === "text").size;
-				const channel_v = interaction.guild!.channels.cache.filter(channel => channel.type === "voice").size;
-				const channel_c = interaction.guild!.channels.cache.filter(channel => channel.type === "category").size;
+				const channel_t = interaction.guild!.channels.cache.filter(channel => channel.type === "GUILD_TEXT").size;
+				const channel_v = interaction.guild!.channels.cache.filter(channel => channel.type === "GUILD_VOICE").size;
+				const channel_c = interaction.guild!.channels.cache.filter(channel => channel.type === "GUILD_CATEGORY").size;
 				const roles = interaction.guild!.roles.cache.size;
 				const salons = interaction.guild!.channels.cache.size;
 				const embedInfoGuild = new MessageEmbed()
@@ -189,7 +197,7 @@ export default class extends Command {
 				if (role.hoist) separation = 'yes'
 				else separation = 'no'
 				const embedRole = new MessageEmbed()
-					.setColor(this.bot.colors.embed)
+					.setColor(this.colors.embed)
 					.setThumbnail(`${interaction.guild!.iconURL() ? interaction.guild!.iconURL() : ''}`)
 					.setAuthor(`Information of role :`, `${interaction.guild!.iconURL() ? interaction.guild!.iconURL() : ''}`)
 					.setTitle(`${role.name}`)
@@ -209,26 +217,26 @@ export default class extends Command {
 				interaction.reply({ embeds: [embedRole] })
 				break;
 			case 'channel':
-				const channel: any = this.bot.util.resolveChannel(interaction.guild!, args.get('channel').value);
+				const channel = this.bot.util.resolveChannel(interaction.guild!, args.get('channel').value);
 				if (!channel) return interaction.replyErrorMessage(`Channel not found.`);
 				let type = '';
 				let nsfw;
-				if (channel.type === 'text') type = `${this.bot.emojis.channel}Text`
-				if (channel.type === 'voice') type = `${this.bot.emojis.voice}Voice`
-				if (channel.type === 'category') type = `Categrory`
+				if (channel.type === 'GUILD_TEXT') { type = `${this.bot.emojis.channel}Text`; if ((channel as TextChannel).nsfw) nsfw = `${this.bot.emojis.CHANNELNSFW} Yes`; }
+				if (channel.type === 'GUILD_VOICE') type = `${this.bot.emojis.voice}Voice`
+				if (channel.type === 'GUILD_CATEGORY') type = `Categrory`
 				if (!type) type = `Other`
-				if (channel.nsfw) nsfw = `${this.bot.emojis.CHANNELNSFW} Yes`;
+
 				else nsfw = `${this.bot.emojis.CHANNELNSFW} No`;
 				const embedChannel = new MessageEmbed()
 					.setAuthor(`Information of a channel :`, `${interaction.guild!.iconURL()}`)
 					.setThumbnail(`${interaction.guild!.iconURL() ? interaction.guild!.iconURL() : ''}`)
-					.setColor(this.bot.colors.embed)
+					.setColor(this.colors.embed)
 					.setTitle(`Channel : ${channel.name}`)
 					.addFields(
 						{ name: 'Channel id :', value: `${channel.id}`, inline: true },
 						{ name: 'Category :', value: `${channel.parent ? channel.parent : 'none'}`, inline: true },
-						{ name: 'Topic :', value: `${channel.topic || 'No topic'}`, inline: false },
-						{ name: 'Catégory ID :', value: `${channel.parentID}`, inline: true },
+						{ name: 'Topic :', value: `${(channel as TextChannel).topic || 'No topic'}`, inline: false },
+						{ name: 'Category ID :', value: `${channel.parentId}`, inline: true },
 						{ name: 'Position :', value: `${channel.position}`, inline: true },
 						{ name: '\u200b', value: `\u200b`, inline: true },
 						{ name: 'Created at  :', value: `${moment.utc(channel.createdTimestamp).format('DD/MM/YYYY - hh:mm')}`, inline: true },

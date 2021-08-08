@@ -20,7 +20,7 @@ class default_1 extends CommandClass_1.default {
         super(bot, {
             name: 'infos',
             aliases: [],
-            args: [],
+            options: [],
             description: 'Get informations',
             category: 'Other',
             cooldown: 5,
@@ -30,7 +30,7 @@ class default_1 extends CommandClass_1.default {
                 {
                     name: 'user',
                     description: 'Allows to have information about a user.',
-                    args: [
+                    options: [
                         {
                             name: 'user',
                             description: 'User to get infos',
@@ -42,17 +42,15 @@ class default_1 extends CommandClass_1.default {
                 {
                     name: 'bot',
                     description: 'Allows to have information about bot.',
-                    args: null,
                 },
                 {
                     name: 'server',
                     description: 'Allows to have information about server.',
-                    args: null,
                 },
                 {
                     name: 'role',
                     description: 'Allows to have information about role.',
-                    args: [
+                    options: [
                         {
                             name: 'role',
                             description: 'Role to get infos',
@@ -64,7 +62,7 @@ class default_1 extends CommandClass_1.default {
                 {
                     name: 'channel',
                     description: 'Allows to have information about channel.',
-                    args: [
+                    options: [
                         {
                             name: 'channel',
                             description: 'Channel to get infos',
@@ -84,31 +82,40 @@ class default_1 extends CommandClass_1.default {
                     const argUser = args.get('user').value;
                     const userInfo = yield this.bot.util.resolveMember(interaction.guild, argUser);
                     if (!userInfo) {
-                        const u = yield this.bot.util.resolveUser(argUser);
-                        if (!u)
-                            return interaction.replyErrorMessage(`User not found`);
-                        let BOTSTATUS;
-                        if (u.bot)
-                            BOTSTATUS = 'yes';
-                        else
-                            BOTSTATUS = 'no';
-                        const embedUser = new discord_js_1.MessageEmbed()
-                            .setAuthor(`${u.username}#${u.discriminator}`, `${u.displayAvatarURL()}`)
-                            .setColor(`${this.bot.colors.EMBEDCOLOR}`)
-                            .setThumbnail(u.displayAvatarURL())
-                            .addField(`\u200b`, `BOT : ${BOTSTATUS}`)
-                            .setDescription('This user is no on the server.')
-                            .setFooter(`User ID : ${u.id}`);
-                        interaction.reply({ embeds: [embedUser] });
+                        this.bot.client.users.fetch(args.get('user').value)
+                            .then(u => {
+                            let BOTSTATUS;
+                            if (!u)
+                                return interaction.replyErrorMessage(`User not found.`);
+                            if (u.bot)
+                                BOTSTATUS = 'yes';
+                            else
+                                BOTSTATUS = 'no';
+                            const embedUser = new discord_js_1.MessageEmbed()
+                                .setAuthor(`${u.username}#${u.discriminator}`, `${u.displayAvatarURL()}`)
+                                .setColor(this.colors.embed)
+                                .setThumbnail(u.displayAvatarURL())
+                                .addField(`\u200b`, `BOT : ${BOTSTATUS}`)
+                                .setDescription('This user is no on the server.')
+                                .setFooter(`User ID : ${u.id}`);
+                            return interaction.reply({ embeds: [embedUser] });
+                        })
+                            .catch(() => interaction.replyErrorMessage(`User not found.`));
                         break;
                     }
                     else {
+                        //if (use.user.presence.status === 'online') status = `${this.bot.emojis.ONLINE}Online`  ;
+                        //if (use.user.presence.status === 'idle') status = `${this.bot.emojis.IDLE}Idle`;
+                        //if (use.user.presence.status === 'dnd') status = `${this.bot.emojis.DND}Dnd`;
+                        //if (use.user.presence.status === 'offline') status = `${this.bot.emojis.OFFLINE}Offline`;
+                        //if (use.user.presence.clientStatus != null && use.user.presence.clientStatus.desktop === 'online') plateforme = '🖥️ Ordinateur'
+                        //if (use.user.presence.clientStatus != null && use.user.presence.clientStatus.mobile === 'online') plateforme = '📱 Mobile'
                         let permissions_arr = userInfo.permissions.toArray().join(', ');
                         let permissions = permissions_arr.toString();
                         permissions = permissions.replace(/\_/g, ' ');
                         const embedMember = new discord_js_1.MessageEmbed();
                         embedMember.setThumbnail(userInfo.user.displayAvatarURL());
-                        embedMember.setColor(this.bot.colors.embed);
+                        embedMember.setColor(this.colors.embed);
                         embedMember.setTitle(`${userInfo.user.username}`);
                         embedMember.addField('ID :', `${userInfo.user.id}`, true);
                         embedMember.addField('Tag :', `${userInfo.user.tag}`, true);
@@ -126,17 +133,17 @@ class default_1 extends CommandClass_1.default {
                     const verssionBot = pck.version;
                     const verssionDjs = pck.dependencies["discord.js"];
                     const embedBot = new discord_js_1.MessageEmbed()
-                        .setColor(this.bot.colors.embed)
+                        .setColor(this.colors.embed)
                         .setAuthor(`${this.bot.client.user.username} Info`, this.bot.client.user.displayAvatarURL())
                         .setThumbnail(this.bot.client.user.displayAvatarURL())
-                        .addFields({ name: 'Developer', value: `Smaug#6739`, inline: true }, { name: 'Data', value: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`, inline: true }, { name: 'Uptime', value: `${Math.floor(this.bot.client.uptime / 1000 / 60).toString()} minutes`, inline: true }, { name: 'Servers', value: `${this.bot.client.guilds.cache.size.toString()}`, inline: true }, { name: 'Channels', value: `${this.bot.client.channels.cache.size.toString()}`, inline: true }, { name: 'Users', value: `${this.bot.client.guilds.cache.map((g) => g.memberCount).reduce((a, b) => a + b)}`, inline: true }, { name: 'Version', value: `${verssionBot}`, inline: true }, { name: 'Library ', value: `discord.js (javascript)`, inline: true }, { name: 'Library verssion', value: `${verssionDjs.replace('^', '')}`, inline: true }, { name: 'Support', value: `[Serveur support ](https://discord.gg/TC7Qjfs)`, inline: true }, { name: 'Invite :', value: `[Invite](https://discord.com/oauth2/authorize?client_id=689210215488684044&scope=bot&permissions=1946446974%20applications.commands)`, inline: true }, { name: 'Top.gg :', value: `[Site](https://top.gg/bot/689210215488684044)`, inline: true })
+                        .addFields({ name: 'Developer', value: `Smaug#6739`, inline: true }, { name: 'Data', value: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`, inline: true }, { name: 'Uptime', value: `${Math.floor(this.bot.client.uptime / 1000 / 60).toString()} minutes`, inline: true }, { name: 'Servers', value: `${this.bot.client.guilds.cache.size.toString()}`, inline: true }, { name: 'Channels', value: `${this.bot.client.channels.cache.size.toString()}`, inline: true }, { name: 'Users', value: `${this.bot.client.guilds.cache.map(g => g.memberCount).reduce((a, b) => a + b)}`, inline: true }, { name: 'Version', value: `${verssionBot}`, inline: true }, { name: 'Library ', value: `discord.js (javascript)`, inline: true }, { name: 'Library verssion', value: `${verssionDjs.replace('^', '')}`, inline: true }, { name: 'Support', value: `[Serveur support ](https://discord.gg/TC7Qjfs)`, inline: true }, { name: 'Invite :', value: `[Invite](https://discord.com/oauth2/authorize?client_id=689210215488684044&scope=bot&permissions=1946446974%20applications.commands)`, inline: true }, { name: 'Top.gg :', value: `[Site](https://top.gg/bot/689210215488684044)`, inline: true })
                         .setTimestamp()
                         .setFooter(`Infos of ${this.bot.client.user.username}. BOT ID : ${this.bot.client.user.id}`);
                     interaction.reply({ embeds: [embedBot] });
                     break;
                 case 'server':
                     const guild_name = interaction.guild.name;
-                    const owner = `<@${interaction.guild.ownerID}>`;
+                    const owner = `<@${interaction.guild.ownerId}>`;
                     const boost = interaction.guild.premiumSubscriptionCount;
                     let boostMsg = '';
                     if (!boost)
@@ -149,9 +156,9 @@ class default_1 extends CommandClass_1.default {
                     // const idle = fetchedMembers.filter(member => member.presence.status === 'idle').size;
                     // const dnd = fetchedMembers.filter(member => member.presence.status === 'dnd').size;
                     // const off = fetchedMembers.filter(member => member.presence.status === 'offline').size;
-                    const channel_t = interaction.guild.channels.cache.filter(channel => channel.type === "text").size;
-                    const channel_v = interaction.guild.channels.cache.filter(channel => channel.type === "voice").size;
-                    const channel_c = interaction.guild.channels.cache.filter(channel => channel.type === "category").size;
+                    const channel_t = interaction.guild.channels.cache.filter(channel => channel.type === "GUILD_TEXT").size;
+                    const channel_v = interaction.guild.channels.cache.filter(channel => channel.type === "GUILD_VOICE").size;
+                    const channel_c = interaction.guild.channels.cache.filter(channel => channel.type === "GUILD_CATEGORY").size;
                     const roles = interaction.guild.roles.cache.size;
                     const salons = interaction.guild.channels.cache.size;
                     const embedInfoGuild = new discord_js_1.MessageEmbed();
@@ -193,7 +200,7 @@ class default_1 extends CommandClass_1.default {
                     else
                         separation = 'no';
                     const embedRole = new discord_js_1.MessageEmbed()
-                        .setColor(this.bot.colors.embed)
+                        .setColor(this.colors.embed)
                         .setThumbnail(`${interaction.guild.iconURL() ? interaction.guild.iconURL() : ''}`)
                         .setAuthor(`Information of role :`, `${interaction.guild.iconURL() ? interaction.guild.iconURL() : ''}`)
                         .setTitle(`${role.name}`)
@@ -208,24 +215,25 @@ class default_1 extends CommandClass_1.default {
                         return interaction.replyErrorMessage(`Channel not found.`);
                     let type = '';
                     let nsfw;
-                    if (channel.type === 'text')
+                    if (channel.type === 'GUILD_TEXT') {
                         type = `${this.bot.emojis.channel}Text`;
-                    if (channel.type === 'voice')
+                        if (channel.nsfw)
+                            nsfw = `${this.bot.emojis.CHANNELNSFW} Yes`;
+                    }
+                    if (channel.type === 'GUILD_VOICE')
                         type = `${this.bot.emojis.voice}Voice`;
-                    if (channel.type === 'category')
+                    if (channel.type === 'GUILD_CATEGORY')
                         type = `Categrory`;
                     if (!type)
                         type = `Other`;
-                    if (channel.nsfw)
-                        nsfw = `${this.bot.emojis.CHANNELNSFW} Yes`;
                     else
                         nsfw = `${this.bot.emojis.CHANNELNSFW} No`;
                     const embedChannel = new discord_js_1.MessageEmbed()
                         .setAuthor(`Information of a channel :`, `${interaction.guild.iconURL()}`)
                         .setThumbnail(`${interaction.guild.iconURL() ? interaction.guild.iconURL() : ''}`)
-                        .setColor(this.bot.colors.embed)
+                        .setColor(this.colors.embed)
                         .setTitle(`Channel : ${channel.name}`)
-                        .addFields({ name: 'Channel id :', value: `${channel.id}`, inline: true }, { name: 'Category :', value: `${channel.parent ? channel.parent : 'none'}`, inline: true }, { name: 'Topic :', value: `${channel.topic || 'No topic'}`, inline: false }, { name: 'Catégory ID :', value: `${channel.parentID}`, inline: true }, { name: 'Position :', value: `${channel.position}`, inline: true }, { name: '\u200b', value: `\u200b`, inline: true }, { name: 'Created at  :', value: `${moment_1.default.utc(channel.createdTimestamp).format('DD/MM/YYYY - hh:mm')}`, inline: true }, { name: 'Type channel:', value: `${type}`, inline: true }, { name: 'Channel NSFW :', value: `${nsfw}`, inline: true })
+                        .addFields({ name: 'Channel id :', value: `${channel.id}`, inline: true }, { name: 'Category :', value: `${channel.parent ? channel.parent : 'none'}`, inline: true }, { name: 'Topic :', value: `${channel.topic || 'No topic'}`, inline: false }, { name: 'Category ID :', value: `${channel.parentId}`, inline: true }, { name: 'Position :', value: `${channel.position}`, inline: true }, { name: '\u200b', value: `\u200b`, inline: true }, { name: 'Created at  :', value: `${moment_1.default.utc(channel.createdTimestamp).format('DD/MM/YYYY - hh:mm')}`, inline: true }, { name: 'Type channel:', value: `${type}`, inline: true }, { name: 'Channel NSFW :', value: `${nsfw}`, inline: true })
                         .setTimestamp()
                         .setFooter('Command module: Fun');
                     interaction.reply({ embeds: [embedChannel] });

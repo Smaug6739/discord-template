@@ -8,7 +8,7 @@ export default class extends Command {
 		super(bot, {
 			name: 'kick',
 			aliases: [],
-			args: [
+			options: [
 				{
 					name: 'user',
 					description: 'User to be banned',
@@ -36,7 +36,7 @@ export default class extends Command {
 		const interactionMember = await this.bot.util.resolveMember(interaction.guild!, interaction.user.id)
 		const user = await this.bot.util.resolveMember(interaction.guild!, argUser);
 		if (!user) return interaction.replyErrorMessage(`User not found.`)
-		if (interactionMember.roles.highest.comparePositionTo(user.roles.highest) <= 0 && interaction.guild!.ownerID !== interaction.user.id) return interaction.replyErrorMessage(`You don't have the permission for this.`)
+		if (interactionMember.roles.highest.comparePositionTo(user.roles.highest) <= 0 && interaction.guild!.ownerId !== interaction.user.id) return interaction.replyErrorMessage(`You don't have the permission for this.`)
 		const embed = new MessageEmbed()
 			.setAuthor(`${user.user.username} (${user.id})`)
 			.setColor(`${this.bot.colors.orange}`)
@@ -46,7 +46,7 @@ export default class extends Command {
 			.setFooter(interaction.user.username, interaction.user.displayAvatarURL());
 		if (user.kickable) {
 			try {
-				await user.send(embed)
+				await user.send({ embeds: [embed] })
 			} finally {
 				user.kick(reason).then(() => {
 					interaction.reply({ embeds: [embed] })

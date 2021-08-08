@@ -32,10 +32,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = __importDefault(require("./config"));
-const config_private_1 = __importDefault(require("./config.private"));
 const discord_resolve_1 = require("discord-resolve");
 const discord_js_1 = require("discord.js");
 const fs_1 = require("fs");
+const path_1 = require("path");
 discord_js_1.CommandInteraction.prototype.replySuccessMessage = function (content) {
     return this.reply(`${config_1.default.emojis.success} ${content}`);
 };
@@ -45,14 +45,13 @@ discord_js_1.CommandInteraction.prototype.replyErrorMessage = function (content)
 class Bot {
     constructor() {
         this.client = new discord_js_1.Client({
-            intents: discord_js_1.Intents.ALL,
+            intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES, discord_js_1.Intents.FLAGS.GUILD_MEMBERS, discord_js_1.Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS, discord_js_1.Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
             partials: ['CHANNEL', 'REACTION', 'USER', 'MESSAGE']
         });
         this.util = new discord_resolve_1.DiscordResolve(this.client);
         this.config = config_1.default;
-        this.privateConfig = config_private_1.default;
-        this.token = config_private_1.default.tokens.discord;
-        this.errorHook = new discord_js_1.WebhookClient(this.privateConfig.logs.error.id, this.privateConfig.logs.error.token);
+        this.token = config_1.default.tokens.discord;
+        this.errorHook = new discord_js_1.WebhookClient({ url: this.config.logs });
         this.owner = config_1.default.owner.username;
         this.commands = new Map();
         this.cooldowns = new Map();
@@ -62,24 +61,26 @@ class Bot {
         this.loadCommands();
         this.loadEvents();
         this.handleErrors();
-        this.client.login(this.privateConfig.tokens.discord);
+        this.client.login(this.config.tokens.discord);
     }
-    loadCommands(dir = './commands') {
+    loadCommands(dir = path_1.join(__dirname, './commands')) {
         return __awaiter(this, void 0, void 0, function* () {
             fs_1.readdirSync(dir).filter(f => !f.endsWith('.js')).forEach((dirs) => __awaiter(this, void 0, void 0, function* () {
                 const commands = fs_1.readdirSync(`${dir}/${dirs}/`).filter(files => files.endsWith(".js"));
                 for (const file of commands) {
-                    const importFile = yield Promise.resolve().then(() => __importStar(require(`./${dir}/${dirs}/${file}`)));
+                    const importFile = yield Promise.resolve().then(() => __importStar(require(`${dir}/${dirs}/${file}`)));
                     const CommandClass = importFile.default;
                     const command = new CommandClass(this);
                     this.commands.set(command.name, command);
+                    // const getFileName = await import(`../${dir}/${dirs}/${file}`);
+                    // this.commands.set(getFileName.help.name, getFileName);
                     console.log(`Command loaded: ${command.name}`);
                 }
                 ;
             }));
         });
     }
-    loadEvents(dir = "./events") {
+    loadEvents(dir = path_1.join(__dirname, "./events")) {
         return __awaiter(this, void 0, void 0, function* () {
             fs_1.readdirSync(dir).forEach((file) => __awaiter(this, void 0, void 0, function* () {
                 const getFile = yield Promise.resolve().then(() => __importStar(require(`${dir}/${file}`))).then(e => e.default);
@@ -96,39 +97,29 @@ class Bot {
             console.warn(error);
             if (!this.client)
                 return;
-            this.errorHook.send({ content: error.toString(), code: 'js' });
+            this.errorHook.send({ content: "```js\n" + error.toString() + "```" });
         });
         process.on('unhandledRejection', (listener) => {
             console.warn(listener);
             if (!this.client)
                 return;
-            this.errorHook.send({ content: listener.toString(), code: 'js' });
+            this.errorHook.send({ content: "```js\n" + listener.toString() + "```" });
         });
         process.on('rejectionHandled', (listener) => {
             console.warn(listener);
             if (!this.client)
                 return;
-            this.errorHook.send({ content: listener.toString(), code: 'js' });
+            this.errorHook.send({ content: "```js" + listener.toString() + "```" });
         });
         process.on('warning', (warning) => {
             console.warn(warning);
             if (!this.client)
                 return;
-            this.errorHook.send({ content: warning.toString(), code: 'js' });
+            this.errorHook.send({ content: "```js" + warning.toString() + "```" });
         });
     }
-    log(type, options) {
-        let id;
-        let token;
-        if (type === 'error') {
-            id = this.privateConfig.logs.error.id;
-            token = this.privateConfig.logs.error.token;
-        }
-        else {
-            id = this.privateConfig.logs.info.id;
-            token = this.privateConfig.logs.info.token;
-        }
-        const webhook = new discord_js_1.WebhookClient(id, token);
+    log(options) {
+        const webhook = new discord_js_1.WebhookClient({ url: this.config.logs });
         webhook.send(options);
     }
 }

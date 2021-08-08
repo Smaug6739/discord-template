@@ -43,4 +43,9 @@ exports.default = {
         arrow: '<:fleche:721288083974389842>',
         coins: '<:coin:746996861121986610>'
     },
+    tokens: {
+        discord: 'ODA5NzAxMzA2NDQ0MDIxNzky.YCY7Gg.aAtX9UA9btiJqLojLW_mQxWtSwo'
+    },
+    mongoose: 'mongodb://localhost:27017/discordbot',
+    logs: 'https://ptb.discord.com/api/webhooks/873835350710177812/eLripiMLYbU6W9cM8ybPOV2dsY0yQUH6v_vyaE65Yq8Rl17xOIPY6S0qJ0DOa9Ap-zWH'
 };

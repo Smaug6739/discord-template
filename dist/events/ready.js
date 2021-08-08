@@ -5,111 +5,62 @@ class default_1 {
         this.bot = bot;
     }
     run() {
-        var _a;
-        const allData = [];
-        for (const [_, command] of this.bot.commands) {
-            if (command.category.toLowerCase() === 'admin')
-                continue;
-            if (command.subCommands.length) {
-                const subCommands = [];
-                for (const subc of command.subCommands) {
-                    const optionsOfSub = [];
-                    if (subc.args && subc.args.length) {
-                        for (const s of subc.args) {
-                            optionsOfSub.push({
-                                name: s.name || 'default_name',
-                                description: s.description || 'default description',
-                                type: s.type || 'STRING',
-                                required: s.required || false
-                            });
-                        }
-                    }
-                    subCommands.push({
-                        name: subc.name,
-                        description: subc.description,
-                        type: 1,
-                        options: optionsOfSub
-                    });
-                }
-                allData.push({
-                    name: command.name,
-                    type: 'SUB_COMMAND_GROUP',
-                    description: command.description,
-                    options: subCommands
-                });
-            }
-            else {
-                const options = [];
-                if (command.args && command.args.length) {
-                    command.args.map((arg) => {
-                        options.push({
-                            name: arg.name || 'default_name',
-                            description: arg.description || 'default description',
-                            type: arg.type || 'STRING',
-                            required: arg.required || false
+        var _a, _b;
+        const data = [];
+        const commandsCategories = [];
+        this.bot.commands.forEach((c) => commandsCategories.push(c.category));
+        const categories = [...new Set(commandsCategories)];
+        for (const category of categories) {
+            const commandsCategory = [...this.bot.commands].filter(([_, c]) => c.category === category);
+            for (const c of commandsCategory) {
+                if ((_a = c[1].subCommands) === null || _a === void 0 ? void 0 : _a.length) {
+                    const commandOptions = [];
+                    c[1].subCommands.forEach((sc) => {
+                        commandOptions.push({
+                            type: 'SUB_COMMAND',
+                            name: sc.name,
+                            description: sc.description,
+                            required: sc.required,
+                            choices: sc.choices,
+                            options: sc.options
                         });
                     });
-                }
-                allData.push({
-                    name: command.name,
-                    description: command.description,
-                    options: options
-                });
-            }
-        }
-        //	this.bot.client.guilds.cache.get('809702809196560405')!.commands.set(allData);
-        // --------------------ADMIN-COMMANDS-------------------- //
-        const allDataAdmin = [];
-        for (const [_, command] of this.bot.commands) {
-            if (command.subCommands.length) {
-                const subCommands = [];
-                for (const subc of command.subCommands) {
-                    const optionsOfSub = [];
-                    if (subc.args && subc.args.length) {
-                        for (const s of subc.args) {
-                            optionsOfSub.push({
-                                name: s.name || 'default_name',
-                                description: s.description || 'default description',
-                                type: s.type || 'STRING',
-                                required: s.required || false
-                            });
-                        }
-                    }
-                    subCommands.push({
-                        name: subc.name,
-                        description: subc.description,
-                        type: 1,
-                        options: optionsOfSub
+                    data.push({
+                        type: 'SUB_COMMAND_GROUP',
+                        name: c[1].name,
+                        description: c[1].description,
+                        options: commandOptions
                     });
                 }
-                allDataAdmin.push({
-                    name: command.name,
-                    type: 'SUB_COMMAND_GROUP',
-                    description: command.description,
-                    options: subCommands
-                });
-            }
-            else {
-                const options = [];
-                if (command.args && command.args.length) {
-                    command.args.map((arg) => {
-                        options.push({
-                            name: arg.name || 'default_name',
-                            description: arg.description || 'default description',
-                            type: arg.type || 'STRING',
-                            required: arg.required || false
+                else if (c[1].options && c[1].options.length) {
+                    const commandOptions = [];
+                    c[1].options.forEach((a) => {
+                        commandOptions.push({
+                            type: 'STRING',
+                            name: a.name,
+                            description: a.description,
+                            required: a.required,
+                            choices: a.choices,
+                            options: a.options
                         });
                     });
+                    data.push({
+                        name: c[1].name,
+                        description: c[1].description,
+                        options: commandOptions
+                    });
                 }
-                allDataAdmin.push({
-                    name: command.name,
-                    description: command.description,
-                    options: options
-                });
+                else {
+                    // No commands args and no subcommands
+                    data.push({
+                        name: c[1].name,
+                        description: c[1].description,
+                    });
+                }
             }
         }
-        this.bot.client.guilds.cache.get('809702809196560405').commands.set(allDataAdmin);
-        console.log(`Logged in as ${(_a = this.bot.client.user) === null || _a === void 0 ? void 0 : _a.tag}!`);
+        this.bot.client.application.commands.set(data, '809702809196560405');
+        console.log(`Logged in as ${(_b = this.bot.client.user) === null || _b === void 0 ? void 0 : _b.tag}!`);
     }
 }
 exports.default = default_1;

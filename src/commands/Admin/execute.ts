@@ -10,7 +10,7 @@ export default class extends Command {
 		super(bot, {
 			name: 'execute',
 			aliases: [],
-			args: [
+			options: [
 				{
 					name: 'command',
 					description: 'command.',

@@ -15,11 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const CommandClass_1 = __importDefault(require("../CommandClass"));
 const util_1 = __importDefault(require("util"));
 class default_1 extends CommandClass_1.default {
-    constructor(bot) {
-        super(bot, {
+    constructor(spiritus) {
+        super(spiritus, {
             name: 'eval',
             aliases: [],
-            args: [
+            options: [
                 {
                     name: 'eval',
                     description: 'the evaled code.',
@@ -50,7 +50,6 @@ class default_1 extends CommandClass_1.default {
                     evaled = `(async () => { ${args.get('eval').value.trim()} })()`;
                 }
                 evaled = yield eval(evaled);
-                console.log(evaled);
                 if (typeof evaled === 'object') {
                     evaled = util_1.default.inspect(evaled, { depth: 0, showHidden: true });
                 }

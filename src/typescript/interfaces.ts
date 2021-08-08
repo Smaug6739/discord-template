@@ -1,4 +1,4 @@
-import type { CommandInteraction, GuildMember, Collection } from 'discord.js'
+import type { CommandInteraction, GuildMember, Collection, HexColorString } from 'discord.js'
 export interface IGuildDB {
 	_id: string;
 	guildID: string;
@@ -27,7 +27,7 @@ export interface IEmojis {
 	[index: string]: string
 }
 export interface IColors {
-	[index: string]: string
+	[index: string]: HexColorString
 }
 
 export interface IConfig {
@@ -58,7 +58,8 @@ export interface IObject {
 export interface ICommandOptions {
 	name: string;
 	aliases: string[];
-	args: Array<ICommandInfosArgs>;
+	args?: Array<ICommandInfosArgs>;
+	options?: Array<ICommandInfosArgs>;
 	category: string;
 	description: string;
 	cooldown: number;

@@ -20,7 +20,7 @@ class default_1 extends CommandClass_1.default {
         super(bot, {
             name: 'mute',
             aliases: [],
-            args: [
+            options: [
                 {
                     name: 'user',
                     description: 'User to mute.',

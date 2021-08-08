@@ -5,11 +5,11 @@ import util from 'util';
 
 export default class extends Command {
 
-	constructor(bot: any) {
-		super(bot, {
+	constructor(spiritus: any) {
+		super(spiritus, {
 			name: 'eval',
 			aliases: [],
-			args: [
+			options: [
 				{
 					name: 'eval',
 					description: 'the evaled code.',
@@ -39,8 +39,6 @@ export default class extends Command {
 			}
 
 			evaled = await eval(evaled!);
-			console.log(evaled);
-
 			if (typeof evaled === 'object') {
 				evaled = util.inspect(evaled, { depth: 0, showHidden: true });
 			} else {
@@ -61,9 +59,9 @@ export default class extends Command {
 		if (fullLen > 2000) {
 			evaled = evaled.match(/[\s\S]{1,1900}[\n\r]/g) || [];
 			if (evaled.length > 3) {
-				interaction.channel.send(`\`\`\`js\n${evaled[0]}\`\`\``);
-				interaction.channel.send(`\`\`\`js\n${evaled[1]}\`\`\``);
-				interaction.channel.send(`\`\`\`js\n${evaled[2]}\`\`\``);
+				interaction.channel!.send(`\`\`\`js\n${evaled[0]}\`\`\``);
+				interaction.channel!.send(`\`\`\`js\n${evaled[1]}\`\`\``);
+				interaction.channel!.send(`\`\`\`js\n${evaled[2]}\`\`\``);
 				return;
 			}
 			return evaled.forEach((message: any) => {
