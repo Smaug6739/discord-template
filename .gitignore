@@ -14,11 +14,13 @@ configuration.js
 configurationdev.js
 configurationbot.js
 
-config.private.ts
-config.private.js
+config.ts
+config.js
 
-config.private.dev.ts
-config.private.dev.js
+config.dev.ts
+config.dev.js
 
-config.private.prod.ts
-config.private.prod.js
+config.prod.ts
+config.prod.js
+
+ignore
