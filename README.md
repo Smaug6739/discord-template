@@ -28,10 +28,16 @@
 
 ## How to install
 
+### Prerequisites
+
+- You need nodejs >= 16.6.0 for start the bot.
+- You need typescript complier `npm i -g typescript`
+
 1. Clone the repo
-2. Clone `configuration.template.js` into the main directory and rename it to `configuration.js`
+2. Clone `config.template.ts` from src directory into the src directory and rename it to `config.ts`
 3. Install the dependencies: `npm install`
-4. Start the bot: `node main.js`
+4. Compile typescript : `npm run build`
+5. Start the bot: `npm run start`
 
 ## Contributions/Licence
 
