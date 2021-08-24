@@ -36,7 +36,7 @@ export default class {
 					const commandOptions: any = [];
 					c[1].options.forEach((a: any) => {
 						commandOptions.push({
-							type: 'STRING',
+							type: a.type || 'STRING',
 							name: a.name,
 							description: a.description,
 							required: a.required,
