@@ -31,17 +31,17 @@ export default class {
 		}
 		/* ---------------COOLDOWNS--------------- */
 		if (!this.bot.admins.includes(interaction.user.id)) {
-			if (!this.bot.cooldowns.has(command.help.name)) {
-				this.bot.cooldowns.set(command.help.name, new Map());
+			if (!this.bot.cooldowns.has(command.name)) {
+				this.bot.cooldowns.set(command.name, new Map());
 			};
 			const timeNow = Date.now();
-			const tStamps = this.bot.cooldowns.get(command.help.name);
-			const cdAmount = (command.help.cooldown || 5) * 1000;
+			const tStamps = this.bot.cooldowns.get(command.name);
+			const cdAmount = (command.cooldown || 5) * 1000;
 			if (tStamps.has(interaction.user.id)) {
 				const cdExpirationTime = tStamps.get(interaction.user.id) + cdAmount;
 				if (timeNow < cdExpirationTime) {
 					const timeLeft = (cdExpirationTime - timeNow) / 1000;
-					return interaction.replyErrorMessage(`Please wait ${timeLeft.toFixed(0)} second(s) before using the command \`${command.help.name}\` again .`);
+					return interaction.replyErrorMessage(`Please wait ${timeLeft.toFixed(0)} second(s) before using the command \`${command.name}\` again .`);
 				}
 			}
 			tStamps.set(interaction.user.id, timeNow);
