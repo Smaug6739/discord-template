@@ -45,4 +45,4 @@ This project has an MIT license. And you are welcome to contribute.
 
 ## Need help
 
-If you have question or need help, open issue.
+If you have question or need help, please open an issue.
