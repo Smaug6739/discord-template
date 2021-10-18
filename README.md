@@ -39,6 +39,7 @@
 4. Compile typescript : `npm run build`
 5. Start the bot: `npm run start`
 
+
 ## Contributions/Licence
 
 This project has an MIT license. And you are welcome to contribute.
