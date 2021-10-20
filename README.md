@@ -31,7 +31,7 @@
 ### Prerequisites
 
 - You need nodejs >= 16.6.0 for start the bot.
-- You need typescript complier `npm i -g typescript`
+- You need typescript complier `npm install -g typescript`
 
 1. Clone the repo
 2. Clone `config.template.ts` from src directory into the src directory and rename it to `config.ts`
