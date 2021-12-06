@@ -31,6 +31,7 @@
 ### Prerequisites
 
 - You need nodejs >= 16.6.0 for start the bot.
+- You need a token of discord bot. (https://discord.dev)
 - You need typescript complier `npm install -g typescript`
 
 1. Clone the repo
