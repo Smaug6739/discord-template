@@ -1,5 +1,7 @@
 # Discord bot template
 
+[Discord V13-dev bot] 
+
 ## Commands
 
 ### Admin
