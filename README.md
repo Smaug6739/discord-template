@@ -2,6 +2,8 @@
 
 [Discord V13-dev bot] 
 
+_This project use a dev version of discord.js_
+
 ## Commands
 
 ### Admin
